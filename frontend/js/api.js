@@ -10,7 +10,7 @@ const ApiClient = {
     const token = Storage.getToken();
     const headers = {
       "Content-Type": "application/json",
-      ...options.headers
+      ...options.headers,
     };
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;
@@ -23,7 +23,7 @@ const ApiClient = {
 
     const fetchOptions = {
       ...options,
-      headers
+      headers,
     };
 
     try {
@@ -41,16 +41,20 @@ const ApiClient = {
           if (errData.detail) {
             // Xử lý Spring ProblemDetail (500, 404, RuntimeException)
             errMsg = errData.detail;
-          } else if (typeof errData === 'object' && !errData.message && Object.keys(errData).length > 0) {
+          } else if (
+            typeof errData === "object" &&
+            !errData.message &&
+            Object.keys(errData).length > 0
+          ) {
             // Xử lý Spring Validation Error Map (400 Bad Request)
             const errors = Object.values(errData);
-            if (typeof errors[0] === 'string') {
-              errMsg = errors.join('\n');
+            if (typeof errors[0] === "string") {
+              errMsg = errors.join("\n");
             }
           } else if (errData.message) {
             errMsg = errData.message;
           }
-        } catch (_) { }
+        } catch (_) {}
         throw new Error(errMsg);
       }
 
@@ -63,12 +67,19 @@ const ApiClient = {
       }
     } catch (error) {
       // Bắt lỗi kết nối mạng / sập server – throw rõ ràng, KHÔNG fallback mock
-      if (error instanceof TypeError && (error.message.includes("failed to fetch") || error.message.includes("NetworkError") || error.message.includes("Failed to fetch"))) {
-        throw new Error("Không thể kết nối đến máy chủ Backend (localhost:8080). Vui lòng đảm bảo Spring Boot đang chạy.");
+      if (
+        error instanceof TypeError &&
+        (error.message.includes("failed to fetch") ||
+          error.message.includes("NetworkError") ||
+          error.message.includes("Failed to fetch"))
+      ) {
+        throw new Error(
+          "Không thể kết nối đến máy chủ Backend. Vui lòng thử lại sau.",
+        );
       }
       throw error;
     }
-  }
+  },
 };
 
 /**
@@ -77,19 +88,35 @@ const ApiClient = {
 const ProductApi = {
   async getProducts() {
     const products = await ApiClient.request("/products");
-    return Array.isArray(products) ? products.sort((a, b) => (a.description || "").localeCompare(b.description || "")) : products;
+    return Array.isArray(products)
+      ? products.sort((a, b) =>
+          (a.description || "").localeCompare(b.description || ""),
+        )
+      : products;
   },
   async searchProductsByName(name) {
-    const products = await ApiClient.request(`/products/search?name=${encodeURIComponent(name)}`);
-    return Array.isArray(products) ? products.sort((a, b) => (a.description || "").localeCompare(b.description || "")) : products;
+    const products = await ApiClient.request(
+      `/products/search?name=${encodeURIComponent(name)}`,
+    );
+    return Array.isArray(products)
+      ? products.sort((a, b) =>
+          (a.description || "").localeCompare(b.description || ""),
+        )
+      : products;
   },
   async getProductsByCategory(categoryId) {
-    const products = await ApiClient.request(`/products/category/${categoryId}`);
-    return Array.isArray(products) ? products.sort((a, b) => (a.description || "").localeCompare(b.description || "")) : products;
+    const products = await ApiClient.request(
+      `/products/category/${categoryId}`,
+    );
+    return Array.isArray(products)
+      ? products.sort((a, b) =>
+          (a.description || "").localeCompare(b.description || ""),
+        )
+      : products;
   },
   getProductById(id) {
     return ApiClient.request(`/products/${id}`);
-  }
+  },
 };
 
 /**
@@ -102,9 +129,9 @@ const ReviewApi = {
   save(productId, rating, comment = "") {
     return ApiClient.request("/reviews", {
       method: "POST",
-      body: JSON.stringify({ productId, rating, comment })
+      body: JSON.stringify({ productId, rating, comment }),
     });
-  }
+  },
 };
 
 /**
@@ -114,15 +141,15 @@ const AuthApi = {
   login(username, password) {
     return ApiClient.request("/auth/login", {
       method: "POST",
-      body: JSON.stringify({ username, password })
+      body: JSON.stringify({ username, password }),
     });
   },
   register(payload) {
     return ApiClient.request("/auth/register", {
       method: "POST",
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
-  }
+  },
 };
 
 /**
@@ -131,30 +158,40 @@ const AuthApi = {
 const AdminProductApi = {
   async getProducts() {
     const products = await ApiClient.request("/admin/products");
-    return Array.isArray(products) ? products.sort((a, b) => (a.description || "").localeCompare(b.description || "")) : products;
+    return Array.isArray(products)
+      ? products.sort((a, b) =>
+          (a.description || "").localeCompare(b.description || ""),
+        )
+      : products;
   },
   getProductById(id) {
     return ApiClient.request(`/admin/products/${id}`);
   },
   async searchProducts(name) {
-    const products = await ApiClient.request(`/admin/products/search?name=${encodeURIComponent(name)}`);
-    return Array.isArray(products) ? products.sort((a, b) => (a.description || "").localeCompare(b.description || "")) : products;
+    const products = await ApiClient.request(
+      `/admin/products/search?name=${encodeURIComponent(name)}`,
+    );
+    return Array.isArray(products)
+      ? products.sort((a, b) =>
+          (a.description || "").localeCompare(b.description || ""),
+        )
+      : products;
   },
   createProduct(payload) {
     return ApiClient.request("/admin/products", {
       method: "POST",
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
   },
   updateProduct(id, payload) {
     return ApiClient.request(`/admin/products/${id}`, {
       method: "PUT",
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
   },
   deleteProduct(id) {
     return ApiClient.request(`/admin/products/${id}`, {
-      method: "DELETE"
+      method: "DELETE",
     });
   },
   uploadProductImage(file) {
@@ -164,15 +201,18 @@ const AdminProductApi = {
     return ApiClient.request("/admin/products/upload", {
       method: "POST",
       body: formData,
-      headers: {}
+      headers: {},
     });
   },
   // BE dùng PUT (không phải PATCH)
   updateProductStatus(id, status) {
-    return ApiClient.request(`/admin/products/${id}/status?status=${encodeURIComponent(status)}`, {
-      method: "PUT"
-    });
-  }
+    return ApiClient.request(
+      `/admin/products/${id}/status?status=${encodeURIComponent(status)}`,
+      {
+        method: "PUT",
+      },
+    );
+  },
 };
 
 /**
@@ -183,26 +223,29 @@ const CartApi = {
     return ApiClient.request("/carts");
   },
   addItem(productId, quantity = 1) {
-    return ApiClient.request(`/carts/add?productId=${productId}&quantity=${quantity}`, {
-      method: "POST"
-    });
+    return ApiClient.request(
+      `/carts/add?productId=${productId}&quantity=${quantity}`,
+      {
+        method: "POST",
+      },
+    );
   },
   updateItem(cartItemId, action) {
     // action: "increase" | "decrease"
     return ApiClient.request(`/carts/update/${cartItemId}?action=${action}`, {
-      method: "PUT"
+      method: "PUT",
     });
   },
   removeItem(cartItemId) {
     return ApiClient.request(`/carts/remove/${cartItemId}`, {
-      method: "DELETE"
+      method: "DELETE",
     });
   },
   clearCart() {
     return ApiClient.request("/carts/clear", {
-      method: "DELETE"
+      method: "DELETE",
     });
-  }
+  },
 };
 
 /**
@@ -215,7 +258,12 @@ const OrderApi = {
   checkout(receiverName, receiverPhone, receiverAddress, note = "") {
     return ApiClient.request("/orders/checkout", {
       method: "POST",
-      body: JSON.stringify({ receiverName, receiverPhone, receiverAddress, note })
+      body: JSON.stringify({
+        receiverName,
+        receiverPhone,
+        receiverAddress,
+        note,
+      }),
     });
   },
   getHistory() {
@@ -226,14 +274,14 @@ const OrderApi = {
   },
   markAsReceived(orderId) {
     return ApiClient.request(`/orders/${orderId}/receive`, {
-      method: "PUT"
+      method: "PUT",
     });
   },
   cancelOrder(orderId) {
     return ApiClient.request(`/orders/${orderId}/cancel`, {
-      method: "PUT"
+      method: "PUT",
     });
-  }
+  },
 };
 
 /**
@@ -247,10 +295,13 @@ const AdminOrderApi = {
     return ApiClient.request(`/admin/orders/${orderId}`);
   },
   updateStatus(orderId, status) {
-    return ApiClient.request(`/admin/orders/${orderId}/status?status=${encodeURIComponent(status)}`, {
-      method: "PUT"
-    });
-  }
+    return ApiClient.request(
+      `/admin/orders/${orderId}/status?status=${encodeURIComponent(status)}`,
+      {
+        method: "PUT",
+      },
+    );
+  },
 };
 
 /**
@@ -263,15 +314,15 @@ const UserApi = {
   updateProfile(payload) {
     return ApiClient.request("/profile", {
       method: "PUT",
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
   },
   changePassword(oldPassword, newPassword, confirmPassword) {
     return ApiClient.request("/profile/password", {
       method: "PUT",
-      body: JSON.stringify({ oldPassword, newPassword, confirmPassword })
+      body: JSON.stringify({ oldPassword, newPassword, confirmPassword }),
     });
-  }
+  },
 };
 
 /**
@@ -287,8 +338,7 @@ const AdminUserApi = {
   updateUser(id, payload) {
     return ApiClient.request(`/admin/users/${id}`, {
       method: "PUT",
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
-  }
+  },
 };
-

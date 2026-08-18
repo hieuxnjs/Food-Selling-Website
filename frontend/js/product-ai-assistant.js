@@ -4,9 +4,12 @@
 
   function getAiEndpoint() {
     if (typeof CONFIG !== "undefined" && CONFIG.API_BASE_URL) {
-      return CONFIG.API_BASE_URL.replace(/\/api\/v1\/?$/, "/api") + "/ai/product-info";
+      return (
+        CONFIG.API_BASE_URL.replace(/\/api\/v1\/?$/, "/api") +
+        "/ai/product-info"
+      );
     }
-    return "http://127.0.0.1:8080/api/ai/product-info";
+    return "https://food-selling-website.onrender.com/api/ai/product-info";
   }
 
   function escapeHtml(value) {
@@ -20,31 +23,37 @@
 
   function renderMarkdown(markdown) {
     const lines = escapeHtml(markdown).split(/\r?\n/);
-    return lines.map((line) => {
-      const text = line
-        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-        .replace(/\*(.*?)\*/g, "<em>$1</em>");
+    return lines
+      .map((line) => {
+        const text = line
+          .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+          .replace(/\*(.*?)\*/g, "<em>$1</em>");
 
-      if (text.startsWith("### ")) return `<h4>${text.slice(4)}</h4>`;
-      if (text.startsWith("## ")) return `<h3>${text.slice(3)}</h3>`;
-      if (text.startsWith("# ")) return `<h3>${text.slice(2)}</h3>`;
-      if (/^\d+\.\s+/.test(text)) return `<p class="ai-assistant-list-item">${text}</p>`;
-      if (text.startsWith("- ")) return `<p class="ai-assistant-list-item">${text.slice(2)}</p>`;
-      return text.trim() ? `<p>${text}</p>` : "";
-    }).join("");
+        if (text.startsWith("### ")) return `<h4>${text.slice(4)}</h4>`;
+        if (text.startsWith("## ")) return `<h3>${text.slice(3)}</h3>`;
+        if (text.startsWith("# ")) return `<h3>${text.slice(2)}</h3>`;
+        if (/^\d+\.\s+/.test(text))
+          return `<p class="ai-assistant-list-item">${text}</p>`;
+        if (text.startsWith("- "))
+          return `<p class="ai-assistant-list-item">${text.slice(2)}</p>`;
+        return text.trim() ? `<p>${text}</p>` : "";
+      })
+      .join("");
   }
 
   async function fetchProductInfo(productName, button, result) {
     button.disabled = true;
-    button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>AI đang khám phá...</span>';
+    button.innerHTML =
+      '<i class="fa-solid fa-spinner fa-spin"></i><span>AI đang khám phá...</span>';
     result.classList.remove("hidden");
-    result.innerHTML = '<div class="ai-assistant-loading">Đang tạo nội dung văn hóa ẩm thực...</div>';
+    result.innerHTML =
+      '<div class="ai-assistant-loading">Đang tạo nội dung văn hóa ẩm thực...</div>';
 
     try {
       const response = await fetch(getAiEndpoint(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productName })
+        body: JSON.stringify({ productName }),
       });
 
       if (!response.ok) {
@@ -62,7 +71,8 @@
       result.innerHTML = `<div class="ai-assistant-error">${escapeHtml(error.message || "Không thể lấy nội dung AI.")}</div>`;
     } finally {
       button.disabled = false;
-      button.innerHTML = '<i class="fa-solid fa-sparkles"></i><span>Khám phá đặc sản</span>';
+      button.innerHTML =
+        '<i class="fa-solid fa-sparkles"></i><span>Khám phá đặc sản</span>';
     }
   }
 
@@ -93,7 +103,9 @@
 
     const button = document.getElementById(API_BUTTON_ID);
     const result = document.getElementById(API_RESULT_ID);
-    button.addEventListener("click", () => fetchProductInfo(title.textContent.trim(), button, result));
+    button.addEventListener("click", () =>
+      fetchProductInfo(title.textContent.trim(), button, result),
+    );
   }
 
   document.addEventListener("DOMContentLoaded", () => {
