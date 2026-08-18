@@ -62,7 +62,7 @@
       result.innerHTML = `<div class="ai-assistant-error">${escapeHtml(error.message || "Không thể lấy nội dung AI.")}</div>`;
     } finally {
       button.disabled = false;
-      button.innerHTML = '<i class="fa-solid fa-sparkles"></i><span>Khám phá đặc sản bằng AI</span>';
+      button.innerHTML = '<i class="fa-solid fa-sparkles"></i><span>Khám phá đặc sản</span>';
     }
   }
 
@@ -79,7 +79,7 @@
     host.innerHTML = `
       <button type="button" id="${API_BUTTON_ID}" class="ai-assistant-button">
         <i class="fa-solid fa-sparkles"></i>
-        <span>Khám phá đặc sản bằng AI</span>
+        <span>Khám phá đặc sản</span>
       </button>
       <div id="${API_RESULT_ID}" class="ai-assistant-result hidden"></div>
     `;

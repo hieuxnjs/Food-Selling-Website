@@ -1,25 +1,26 @@
 spring:
   application:
     name: FoodSelling
+  config:
+    import: optional:file:.env[.properties],optional:file:../.env[.properties]
 
-  # 1. Cấu hình database
+  # 1. Cau hinh database
   datasource:
-    url: jdbc:mysql://localhost:3306/foodshop_db2?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-    username: root
-    password: Manh3425
-    # password: 123456
+    url: ${DB_URL:jdbc:mysql://localhost:3306/foodshop_db2?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-  # 2. Cấu hình JPA / Hibernate
+  # 2. Cau hinh JPA / Hibernate
   jpa:
     hibernate:
-      ddl-auto: update # Dùng 'update' khi dev, chuyển thành 'validate' khi lên production
-    show-sql: true # Hiện câu lệnh SQL dưới console để dễ debug
+      ddl-auto: update
+    show-sql: true
     properties:
       hibernate:
         format-sql: true
 
-  # 3. Cấu hình upload file ảnh (Ảnh sản phẩm, Banner)
+  # 3. Cau hinh upload file anh
   servlet:
     multipart:
       max-file-size: 5MB
@@ -28,28 +29,26 @@ spring:
     ansi:
       enabled: ALWAYS
 
-# 4. Cấu hình Cloudinary
+# 4. Cau hinh Cloudinary
 cloudinary:
-  cloud-name: dauqf1ejo
-  # api-key: ${CLOUDINARY_API_KEY}
-  # api-secret: ${CLOUDINARY_API_SECRET}
-  api-key: "854824658373319"
-  api-secret: "xq0QW8brZfURc-Wx98rzKeEx8To"
+  cloud-name: ${CLOUDINARY_CLOUD_NAME}
+  api-key: ${CLOUDINARY_API_KEY}
+  api-secret: ${CLOUDINARY_API_SECRET}
 
-# 5.Cấu hình để swagger quét tất cả các api trong controller
+# 5. Cau hinh swagger
 springdoc:
   packages_to_scan: vn.manh.FoodSelling.controller
   swagger-ui:
-    path: /swagger-ui.html  # Đường dẫn đến trang chứa api docs - swaggerUI
+    path: /swagger-ui.html
 
-  # 6.Cấu hình JWT (JSON Web Token) cho bảo mật API
+# 6. Cau hinh JWT
 jwt:
-  secret: "9a4f2c8d3e1b7a6c5d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c"
-  expiration: 86400000 #1 ngày (tính bằng milliseconds)
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:86400000}
 
-# 7. Cấu hình Groq API
+# 7. Cau hinh Groq API
 ai:
   groq:
-    api-key: "API_KEY_AI"
-    url: "https://api.groq.com/openai/v1/chat/completions"
-    model: "llama-3.1-8b-instant"
+    api-key: ${GROQ_API_KEY}
+    url: ${GROQ_API_URL:https://api.groq.com/openai/v1/chat/completions}
+    model: ${GROQ_MODEL:openai/gpt-oss-20b}
