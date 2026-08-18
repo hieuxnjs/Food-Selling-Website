@@ -1,13 +1,10 @@
 package vn.manh.FoodSelling.config;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-// Hiện tại chỉ có 1 cấu hình để cho phép truy cập vào folder uploads, sau này nếu cần thêm cấu hình khác thì có thể thêm vào class này
-// Để browser sử dụng image file trong folder uploads
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
@@ -18,21 +15,12 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("file:" + System.getProperty("user.dir") + "/uploads/");
     }
 
-    // Cấu hình CORS để cho phép frontend có thể gọi API mà không bị lỗi CORS,
-    // chỉ cho phép domain https://myfrontend.com và http://localhost:3000 (dùng khi
-    // chạy frontend ở local)
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/**") // Áp dụng cho mọi API có tiền tố /api
-                        .allowedOriginPatterns("*") // Cho phép mọi domain, bao gồm cả file:/// và các IP mạng LAN
-                        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS") // Giới hạn các phương thức
-                        .allowedHeaders("*")
-                        .allowCredentials(true); // Cho phép gửi kèm Cookie/Token nếu cần
-            }
-        };
-
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/api/**")
+                .allowedOriginPatterns("*")
+                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
 }
