@@ -6,7 +6,7 @@ spring:
 
   # 1. Cau hinh database
   datasource:
-    url: ${DB_URL:jdbc:mysql://localhost:3306/foodshop_db2?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    url: ${DB_URL:jdbc:mysql://shuttle.proxy.rlwy.net:18057/railway?useSSL=true&serverTimezone=UTC}
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
